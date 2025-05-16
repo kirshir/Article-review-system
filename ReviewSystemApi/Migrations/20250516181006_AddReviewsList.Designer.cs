@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ReviewSystemApi.Data;
@@ -11,9 +12,11 @@ using ReviewSystemApi.Data;
 namespace ReviewSystemApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250516181006_AddReviewsList")]
+    partial class AddReviewsList
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -82,8 +85,7 @@ namespace ReviewSystemApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ArticleId")
-                        .IsUnique();
+                    b.HasIndex("ArticleId");
 
                     b.HasIndex("ReviewerId");
 
@@ -159,8 +161,8 @@ namespace ReviewSystemApi.Migrations
             modelBuilder.Entity("ReviewSystemApi.Models.Review", b =>
                 {
                     b.HasOne("ReviewSystemApi.Models.Article", "Article")
-                        .WithOne("Review")
-                        .HasForeignKey("ReviewSystemApi.Models.Review", "ArticleId")
+                        .WithMany("Reviews")
+                        .HasForeignKey("ArticleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -177,7 +179,7 @@ namespace ReviewSystemApi.Migrations
 
             modelBuilder.Entity("ReviewSystemApi.Models.Article", b =>
                 {
-                    b.Navigation("Review");
+                    b.Navigation("Reviews");
                 });
 #pragma warning restore 612, 618
         }

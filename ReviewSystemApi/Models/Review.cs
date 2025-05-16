@@ -2,7 +2,6 @@ namespace ReviewSystemApi.Models;
 
 public enum ReviewStatus
 {
-    UnderRevision,
     Accepted,
     Rejected
 }

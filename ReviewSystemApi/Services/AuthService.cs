@@ -29,19 +29,19 @@ public class AuthService : IAuthService
 
     public async Task<AuthResponseDto> RegisterAsync(RegisterDto dto, string? currentUserName)
     {
-        if (dto.Role == UserRole.Admin)
-        {
-            if (string.IsNullOrEmpty(currentUserName))
-            {
-                throw new Exception("Authentication required to create admin users");
-            }
+        // if (dto.Role == UserRole.Admin)
+        // {
+        //     if (string.IsNullOrEmpty(currentUserName))
+        //     {
+        //         throw new Exception("Authentication required to create admin users");
+        //     }
 
-            var currentUser = await _context.Users.FirstOrDefaultAsync(u => u.Username == currentUserName);
-            if (currentUser == null || currentUser.Role != UserRole.Admin)
-            {
-                throw new Exception("Only admins can create admin users");
-            }
-        }
+        //     var currentUser = await _context.Users.FirstOrDefaultAsync(u => u.Username == currentUserName);
+        //     if (currentUser == null || currentUser.Role != UserRole.Admin)
+        //     {
+        //         throw new Exception("Only admins can create admin users");
+        //     }
+        // }
         
         if (await _context.Users.AnyAsync(u => u.Username == dto.Username || u.Email == dto.Email))
         {

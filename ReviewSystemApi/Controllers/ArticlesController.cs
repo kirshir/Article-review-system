@@ -9,7 +9,6 @@ namespace ReviewSystemApi.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize(Roles = "Author")]
 public class ArticlesController : ControllerBase
 {
     private readonly AppDbContext _context;
@@ -20,14 +19,15 @@ public class ArticlesController : ControllerBase
     }
 
     [HttpPost("upload")]
+    [Authorize(Roles = "Author")]
     public async Task<IActionResult> Upload([FromForm] ArticleCreateDto dto)
     {
         try
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == User.Identity!.Name);
-            if (user == null)
+            if (user == null || user.IsBlocked)
             {
-                return Unauthorized();
+                return Unauthorized("User is blocked or not found");
             }
 
             var fileExtension = Path.GetExtension(dto.File.FileName).ToLower();
@@ -58,6 +58,91 @@ public class ArticlesController : ControllerBase
             await _context.SaveChangesAsync();
 
             return Ok(new { message = "Article uploaded successfully", articleId = article.Id });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpGet]
+    [Authorize(Roles = "Reviewer,Admin")]
+    public async Task<IActionResult> GetArticles()
+    {
+        var articles = await _context.Articles
+            .Where(a => a.Status == ArticleStatus.Pending)
+            .Select(a => new
+            {
+                a.Id,
+                a.Title,
+                a.SubmissionDate,
+                AuthorName = a.Author!.Username
+            })
+            .ToListAsync();
+
+        return Ok(articles);
+    }
+
+    [HttpGet("my-articles")]
+    [Authorize(Roles = "Author")]
+    public async Task<IActionResult> GetMyArticles()
+    {
+        try
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == User.Identity!.Name);
+            if (user == null)
+            {
+                return Unauthorized("User not found");
+            }
+
+            var articles = await _context.Articles
+                .Where(a => a.AuthorId == user.Id)
+                .Select(a => new
+                {
+                    a.Id,
+                    a.Title,
+                    a.Status,
+                    a.SubmissionDate,
+                    Review = a.Review != null ? new
+                    {
+                        a.Review.Id,
+                        ReviewerName = a.Review.Reviewer!.Username,
+                        a.Review.ReviewText,
+                        a.Review.Status,
+                        a.Review.ReviewDate
+                    } : null
+                })
+                .ToListAsync();
+
+            return Ok(articles);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> DeleteArticle(int id)
+    {
+        try
+        {
+            var article = await _context.Articles.FirstOrDefaultAsync(a => a.Id == id);
+            if (article == null)
+            {
+                return NotFound("Article not found");
+            }
+
+            if (System.IO.File.Exists(article.FilePath))
+            {
+                System.IO.File.Delete(article.FilePath); 
+            }
+
+            _context.Articles.Remove(article);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Article deleted successfully" });
         }
         catch (Exception ex)
         {

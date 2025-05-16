@@ -22,7 +22,7 @@ public class AppDbContext : DbContext
 
         modelBuilder.Entity<User>()
             .Property(u => u.Role)
-            .HasConversion<string>(); 
+            .HasConversion<string>();
 
         modelBuilder.Entity<Article>()
             .Property(a => a.Status)
@@ -30,7 +30,7 @@ public class AppDbContext : DbContext
 
         modelBuilder.Entity<Review>()
             .Property(r => r.Status)
-            .HasConversion<string>();   
+            .HasConversion<string>();
 
         modelBuilder.Entity<Article>()
             .HasOne(a => a.Author)
@@ -40,8 +40,8 @@ public class AppDbContext : DbContext
 
         modelBuilder.Entity<Review>()
             .HasOne(r => r.Article)
-            .WithMany()
-            .HasForeignKey(r => r.ArticleId)
+            .WithOne(a => a.Review) 
+            .HasForeignKey<Review>(r => r.ArticleId)
             .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<Review>()
@@ -49,5 +49,9 @@ public class AppDbContext : DbContext
             .WithMany()
             .HasForeignKey(r => r.ReviewerId)
             .OnDelete(DeleteBehavior.Cascade);    
+            
+        modelBuilder.Entity<User>()
+            .Property(u => u.IsBlocked)
+            .HasDefaultValue(false);
     }
 }

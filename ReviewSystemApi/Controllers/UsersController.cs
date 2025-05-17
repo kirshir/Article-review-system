@@ -95,9 +95,8 @@ public class UsersController : ControllerBase
             return BadRequest(ex.Message);
         }
     }
-    
+
     [HttpPut("{username}")]
-    [Authorize(Roles = "Author,Admin")] 
     public async Task<IActionResult> UpdateUser(string username, [FromBody] UpdateUserDto dto)
     {
         try
@@ -121,6 +120,31 @@ public class UsersController : ControllerBase
 
             await _context.SaveChangesAsync();
             return Ok(new { message = "User information updated successfully" });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpGet]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> GetUsers()
+    {
+        try
+        {
+            var users = await _context.Users
+                .Select(u => new
+                {
+                    u.Id,
+                    u.Username,
+                    u.Email,
+                    Role = u.Role.ToString(),
+                    u.IsBlocked
+                })
+                .ToListAsync();
+
+            return Ok(users);
         }
         catch (Exception ex)
         {

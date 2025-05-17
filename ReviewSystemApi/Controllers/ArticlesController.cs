@@ -175,13 +175,35 @@ public class ArticlesController : ControllerBase
 
             if (System.IO.File.Exists(article.FilePath))
             {
-                System.IO.File.Delete(article.FilePath); 
+                System.IO.File.Delete(article.FilePath);
             }
 
             _context.Articles.Remove(article);
             await _context.SaveChangesAsync();
 
             return Ok(new { message = "Article deleted successfully" });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+    
+    [HttpGet("{id}/download")]
+    [Authorize(Roles = "Reviewer,Admin")]
+    public async Task<IActionResult> DownloadArticle(int id)
+    {
+        try
+        {
+            var article = await _context.Articles.FirstOrDefaultAsync(a => a.Id == id);
+            if (article == null || !System.IO.File.Exists(article.FilePath))
+            {
+                return NotFound("Article not found or file does not exist");
+            }
+
+            var fileStream = new FileStream(article.FilePath, FileMode.Open, FileAccess.Read);
+            var fileName = Path.GetFileName(article.FilePath);
+            return File(fileStream, "application/octet-stream", fileName);
         }
         catch (Exception ex)
         {

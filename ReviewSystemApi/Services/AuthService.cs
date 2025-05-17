@@ -6,7 +6,6 @@ using ReviewSystemApi.Models.Dtos;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using BCrypt.Net;
 
 namespace ReviewSystemApi.Services;
 
@@ -29,6 +28,7 @@ public class AuthService : IAuthService
 
     public async Task<AuthResponseDto> RegisterAsync(RegisterDto dto, string? currentUserName)
     {
+        //только администратор может создавать администраторов
         // if (dto.Role == UserRole.Admin)
         // {
         //     if (string.IsNullOrEmpty(currentUserName))
@@ -42,7 +42,7 @@ public class AuthService : IAuthService
         //         throw new Exception("Only admins can create admin users");
         //     }
         // }
-        
+
         if (await _context.Users.AnyAsync(u => u.Username == dto.Username || u.Email == dto.Email))
         {
             throw new Exception("Username or email already exists");

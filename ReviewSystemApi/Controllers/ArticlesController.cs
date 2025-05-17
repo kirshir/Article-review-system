@@ -57,6 +57,23 @@ public class ArticlesController : ControllerBase
             _context.Articles.Add(article);
             await _context.SaveChangesAsync();
 
+            var reviewers = await _context.Users
+                .Where(u => u.Role == UserRole.Reviewer && !u.IsBlocked)
+                .ToListAsync();
+
+            foreach (var reviewer in reviewers)
+            {
+                var assignment = new ReviewAssignment
+                {
+                    ArticleId = article.Id,
+                    ReviewerId = reviewer.Id,
+                    AssignedAt = DateTime.UtcNow
+                };
+                _context.ReviewAssignments.Add(assignment);
+            }
+
+            await _context.SaveChangesAsync();
+
             return Ok(new { message = "Article uploaded successfully", articleId = article.Id });
         }
         catch (Exception ex)
@@ -69,18 +86,40 @@ public class ArticlesController : ControllerBase
     [Authorize(Roles = "Reviewer,Admin")]
     public async Task<IActionResult> GetArticles()
     {
-        var articles = await _context.Articles
-            .Where(a => a.Status == ArticleStatus.Pending)
-            .Select(a => new
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == User.Identity!.Name);
+        if (user == null)
+        {
+            return Unauthorized("User not found");
+        }
+
+        if (User.IsInRole("Admin"))
+        {
+            var articles = await _context.Articles
+                .Where(a => a.Status == ArticleStatus.Pending)
+                .Select(a => new
+                {
+                    a.Id,
+                    a.Title,
+                    a.SubmissionDate,
+                    AuthorName = a.Author!.Username
+                })
+                .ToListAsync();
+            return Ok(articles);
+        }
+
+        // для рецензентов показываем только назначенные статьи от которых они не отказались
+        var assignedArticles = await _context.ReviewAssignments
+            .Where(ra => ra.Reviewer!.Username == User.Identity!.Name && !ra.Declined)
+            .Select(ra => new
             {
-                a.Id,
-                a.Title,
-                a.SubmissionDate,
-                AuthorName = a.Author!.Username
+                ra.Article!.Id,
+                ra.Article.Title,
+                ra.Article.SubmissionDate,
+                AuthorName = ra.Article.Author!.Username
             })
             .ToListAsync();
 
-        return Ok(articles);
+        return Ok(assignedArticles);
     }
 
     [HttpGet("my-articles")]

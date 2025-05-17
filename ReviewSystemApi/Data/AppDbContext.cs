@@ -8,8 +8,9 @@ public class AppDbContext : DbContext
     public DbSet<User> Users {get; set;}
     public DbSet<Article> Articles {get; set;}
     public DbSet<Review> Reviews {get; set;}
+    public DbSet<ReviewAssignment> ReviewAssignments { get; set; }
 
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) {}
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -40,7 +41,7 @@ public class AppDbContext : DbContext
 
         modelBuilder.Entity<Review>()
             .HasOne(r => r.Article)
-            .WithOne(a => a.Review) 
+            .WithOne(a => a.Review)
             .HasForeignKey<Review>(r => r.ArticleId)
             .OnDelete(DeleteBehavior.Cascade);
 
@@ -48,10 +49,21 @@ public class AppDbContext : DbContext
             .HasOne(r => r.Reviewer)
             .WithMany()
             .HasForeignKey(r => r.ReviewerId)
-            .OnDelete(DeleteBehavior.Cascade);    
-            
+            .OnDelete(DeleteBehavior.Cascade);
+
         modelBuilder.Entity<User>()
             .Property(u => u.IsBlocked)
             .HasDefaultValue(false);
+        
+        modelBuilder.Entity<ReviewAssignment>()
+            .HasOne(ra => ra.Article)
+            .WithMany()
+            .HasForeignKey(ra => ra.ArticleId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<ReviewAssignment>()
+            .HasOne(ra => ra.Reviewer)
+            .WithMany()
+            .HasForeignKey(ra => ra.ReviewerId);
     }
 }

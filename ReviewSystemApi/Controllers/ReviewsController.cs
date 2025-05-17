@@ -36,6 +36,13 @@ public class ReviewsController : ControllerBase
                 return BadRequest("Article not found or not available for review");
             }
 
+            var assignment = await _context.ReviewAssignments
+                .FirstOrDefaultAsync(ra => ra.ArticleId == dto.ArticleId && ra.ReviewerId == reviewer.Id);
+            if (assignment == null || assignment.Declined)
+            {
+                return BadRequest("You are not assigned to review this article or have declined it");
+            }
+
             if (article.Review != null)
             {
                 return BadRequest("Article already has a review");
@@ -58,6 +65,72 @@ public class ReviewsController : ControllerBase
             await _context.SaveChangesAsync();
 
             return Ok(new { message = "Review submitted successfully", reviewId = review.Id });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpPost("{articleId}/decline")]
+    public async Task<IActionResult> DeclineReview(int articleId)
+    {
+        try
+        {
+            var reviewer = await _context.Users.FirstOrDefaultAsync(u => u.Username == User.Identity!.Name);
+            if (reviewer == null || reviewer.IsBlocked)
+            {
+                return Unauthorized("User is blocked or not found");
+            }
+
+            var article = await _context.Articles.FirstOrDefaultAsync(a => a.Id == articleId);
+            if (article == null || article.Status != ArticleStatus.Pending)
+            {
+                return BadRequest("Article not found or not available for review");
+            }
+
+            var assignment = await _context.ReviewAssignments
+                .FirstOrDefaultAsync(ra => ra.ArticleId == articleId && ra.ReviewerId == reviewer.Id);
+            if (assignment == null)
+            {
+                return BadRequest("You are not assigned to review this article");
+            }
+
+            assignment.Declined = true;
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Review declined successfully" });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpGet("my-reviews")]
+    public async Task<IActionResult> GetMyReviews()
+    {
+        try
+        {
+            var reviewer = await _context.Users.FirstOrDefaultAsync(u => u.Username == User.Identity!.Name);
+            if (reviewer == null)
+            {
+                return Unauthorized("User not found");
+            }
+
+            var reviews = await _context.Reviews
+                .Where(r => r.ReviewerId == reviewer.Id)
+                .Select(r => new
+                {
+                    r.Id,
+                    ArticleTitle = r.Article!.Title,
+                    r.ReviewText,
+                    r.Status,
+                    r.ReviewDate
+                })
+                .ToListAsync();
+
+            return Ok(reviews);
         }
         catch (Exception ex)
         {

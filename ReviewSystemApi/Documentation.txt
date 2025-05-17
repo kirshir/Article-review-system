@@ -1,0 +1,247 @@
+ReviewSystemApi Documentation  
+
+Базовый URL: http://localhost:5006/api  
+
+Аутентификация  
+Все эндпоинты требуют аутентификации с использованием JWT-токена, за исключением /auth/register и /auth/login. 
+Для получения токена выполните запрос POST /auth/login с указанием username и password. Токен необходимо включать в заголовке каждого защищённого запроса в формате: Authorization: Bearer <your_jwt_token> 
+Токен выдаётся при успешном входе и используется для проверки роли пользователя.  
+
+
+------------------------------------------------------Эндпоинты----------------------------------------------------------------------------  
+
+POST http://localhost:5006/api/auth/register  
+Описание: Регистрация нового пользователя в системе.  
+Доступ: Любой (без аутентификации).  
+Тело запроса:  
+{  
+  "username": "string",  
+  "password": "string",  
+  "email": "string",  
+  "fullName": "string",
+  "specialization": "string",
+  "location": "string",
+  "role": "integer" // 0 для Author, 1 для Reviewer, 2 для Admin
+}  
+
+Ответ (успех):  
+{
+  "token": "string", // JWT токен
+  "role": "string" // Роль пользователя (например, "Author")
+}
+
+
+
+POST http://localhost:5006/api/auth/login  
+Описание: Аутентификация пользователя и выдача JWT-токена.  
+Доступ: Любой (без аутентификации).  
+Тело запроса:  
+{  
+  "username": "string",  
+  "password": "string"  
+}  
+
+Ответ (успех):  
+{  
+  "token": "string" // JWT токен  
+  "role": "string"
+}  
+
+
+
+POST http://localhost:5006/api/articles/upload  
+Описание: Загрузка новой статьи для рецензирования в формате PDF или DOCX.  
+Доступ: Автор.  
+Тело запроса: Form-data  
+Title: "string" // Название статьи  
+File: file // Файл PDF или DOCX  
+
+Ответ (успех):  
+{  
+  "message": "Article uploaded successfully",  
+  "articleId": "integer"  
+}  
+
+
+
+GET http://localhost:5006/api/articles  
+Описание: Получение списка статей, доступных для рецензирования (для рецензентов) или всех статей в статусе Pending (для администраторов).
+Доступ: Рецензент, Администратор.  
+Тело запроса: Нет.  
+
+Ответ (успех):  
+[  
+  {  
+    "id": "integer",  
+    "title": "string",  
+    "submissionDate": "datetime",  
+    "authorName": "string"  
+  }  
+]  
+
+
+
+GET http://localhost:5006/api/articles/my-articles  
+Описание: Получение списка статей, отправленных текущим автором, с их статусом и рецензией (если есть).  
+Доступ: Автор.  
+Тело запроса: Нет.  
+
+Ответ (успех):  
+[  
+  {  
+    "id": "integer",  
+    "title": "string",  
+    "status": "integer", // 0-"Pending", 1-"Accepted", 2-"Rejected"  
+    "submissionDate": "datetime",  
+    "review": {  
+      "id": "integer",  
+      "reviewerName": "string",  
+      "reviewText": "string",  
+      "status": "integer", // 1-"Accepted", 2-"Rejected"  
+      "reviewDate": "datetime"  
+    } // или null, если рецензии нет  
+  }  
+]  
+
+
+
+DELETE http://localhost:5006/api/articles/{id}  
+Описание: Удаление статьи и связанного файла.  
+Доступ: Администратор.  
+Тело запроса: Нет.  
+
+Ответ (успех):  
+{  
+  "message": "Article deleted successfully"  
+}  
+
+
+
+POST http://localhost:5006/api/reviews  
+Описание: Создание рецензии для статьи. Возможна только одна рецензия на статью.  
+Доступ: Рецензент.  
+Тело запроса:  
+{  
+  "articleId": "integer",  
+  "reviewText": "string",  
+  "isApproved": "boolean" // true для принятия, false для отклонения  
+}  
+
+Ответ (успех):  
+{  
+  "message": "Review submitted successfully",  
+  "reviewId": "integer"  
+}  
+
+
+
+POST http://localhost:5006/api/reviews/{articleId}/decline  
+Описание: Отказ от рецензирования назначенной статьи, что делает её недоступной для текущего рецензента.  
+Доступ: Рецензент.  
+Тело запроса: Нет.  
+
+Ответ (успех):  
+{  
+  "message": "Review declined successfully"  
+}  
+
+
+
+GET http://localhost:5006/api/reviews/my-reviews  
+Описание: Получение истории рецензий, созданных текущим рецензентом.  
+Доступ: Рецензент.  
+Тело запроса: Нет.  
+
+Ответ (успех):  
+[  
+  {  
+    "id": "integer",  
+    "articleTitle": "string",  
+    "reviewText": "string",  
+    "status": "integer", // 0-"Accepted", 1-"Rejected"  
+    "reviewDate": "datetime"  
+  }  
+]  
+
+
+
+POST http://localhost:5006/api/users/create  
+Описание: Создание нового пользователя с указанной ролью.  
+Доступ: Администратор.  
+Тело запроса:  
+{  
+  "username": "string",  
+  "password": "string",  
+  "email": "string",  
+  "role": "integer" // 0 для Author, 1 для Reviewer, 2 для Admin
+}  
+
+Ответ (успех):  
+{  
+  "message": "User created successfully",  
+  "userId": "integer"  
+}  
+
+
+
+DELETE http://localhost:5006/api/users/{username}  
+Описание: Удаление пользователя по имени пользователя.  
+Доступ: Администратор.  
+Тело запроса: Нет.
+
+Ответ (успех):  
+{  
+  "message": "User deleted successfully"  
+}  
+
+
+
+PUT http://localhost:5006/api/users/block/{username}  
+Описание: Блокировка или разблокировка пользователя.  
+Доступ: Администратор.  
+Тело запроса:  
+{  
+  "isBlocked": "boolean" // true для блокировки, false для разблокировки  
+}  
+
+Ответ (успех):  
+{  
+  "message": "User blocked successfully" // или "User unblocked successfully"  
+}  
+
+
+
+PUT http://localhost:5006/api/users/{username}  
+Описание: Обновление личной информации пользователя. Пользователь может обновлять только свой профиль, если он не администратор.  
+Доступ: Автор (свой профиль), Администратор (любой пользователь).  
+Тело запроса:  
+{  
+  "email": "string", // опционально  
+  "fullName": "string", // опционально  
+  "location": "string", // опционально  
+  "specialization": "string" // опционально  
+}  
+
+Ответ (успех):  
+{  
+  "message": "User information updated successfully"  
+}  
+
+
+
+Ошибки  
+Все эндпоинты могут возвращать следующие ошибки:  
+400 Bad Request:  
+{  
+  "message": "Описание ошибки"  
+} 
+
+401 Unauthorized:  
+{  
+  "message": "Пользователь заблокирован или не найден"  
+}
+  
+404 Not Found:  
+{  
+  "message": "Ресурс не найден"  
+}  

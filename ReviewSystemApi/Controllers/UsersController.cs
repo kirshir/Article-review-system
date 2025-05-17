@@ -29,7 +29,7 @@ public class UsersController : ControllerBase
                 return BadRequest("Username already exists");
             }
 
-            var passwordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password); 
+            var passwordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password);
             var user = new User
             {
                 Username = dto.Username,
@@ -89,6 +89,38 @@ public class UsersController : ControllerBase
             await _context.SaveChangesAsync();
 
             return Ok(new { message = $"User {(dto.IsBlocked ? "blocked" : "unblocked")} successfully" });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+    
+    [HttpPut("{username}")]
+    [Authorize(Roles = "Author,Admin")] 
+    public async Task<IActionResult> UpdateUser(string username, [FromBody] UpdateUserDto dto)
+    {
+        try
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
+
+            var currentUser = User.Identity!.Name;
+            if (currentUser != username && !User.IsInRole("Admin"))
+            {
+                return Unauthorized("You can only update your own profile");
+            }
+
+            if (dto.Email != null) user.Email = dto.Email;
+            if (dto.FullName != null) user.FullName = dto.FullName;
+            if (dto.Location != null) user.Location = dto.Location;
+            if (dto.Specialization != null) user.Specialization = dto.Specialization;
+
+            await _context.SaveChangesAsync();
+            return Ok(new { message = "User information updated successfully" });
         }
         catch (Exception ex)
         {

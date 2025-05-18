@@ -1,10 +1,13 @@
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify'; 
 import { BASE_URL } from '../config';
+import { useContext } from 'react';
+import AuthContext from '../context/AuthContext';
 import '../assets/Login.css';
 
 const Login = () => {
     const navigate = useNavigate();
+    const { setAuthToken } = useContext(AuthContext);
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -26,7 +29,7 @@ const Login = () => {
             }
 
             const data = await response.json();
-            localStorage.setItem('token', data.token);  //сохраняем токен в localStorage
+            setAuthToken(data.token);
             toast.success('Вход выполнен успешно!');
             navigate('/dashboard');
         } catch(error) {

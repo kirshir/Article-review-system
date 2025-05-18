@@ -1,11 +1,14 @@
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { BASE_URL } from '../config'; 
+import { useContext } from 'react';
+import AuthContext from '../context/AuthContext';
 import '../assets/Register.css';
 
 const Register = () => {
     const navigate = useNavigate();
-    
+    const { setAuthToken } = useContext(AuthContext);
+
     const handleRegister = async (e) => {
         e.preventDefault();
 
@@ -31,9 +34,11 @@ const Register = () => {
             }
 
             const data = await response.json();
-            localStorage.setItem('token', data.token); 
+            setAuthToken(data.token);
             toast.success('Регистрация успешна!');
-            navigate('/dashboard'); 
+            setTimeout(() => {
+                navigate('/dashboard');
+            }, 1000); // задержка на секунду перед входом
         } catch(error) {
             toast.error(error.message);
         }

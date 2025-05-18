@@ -29,7 +29,7 @@ const Login = () => {
             }
 
             const data = await response.json();
-            setAuthToken(data.token);
+            setAuthToken(data.token, username);
             toast.success('Вход выполнен успешно!');
             navigate('/dashboard');
         } catch(error) {

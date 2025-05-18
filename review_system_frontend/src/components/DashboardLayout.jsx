@@ -2,13 +2,15 @@ import { Routes, Route, useNavigate } from 'react-router-dom';
 import { useEffect, useState, useContext } from 'react';
 import { getUserRole } from '../utils/auth';
 import AuthContext from '../context/AuthContext';
+import ProfilePage from './ProfilePage';
 import '../assets/DashboardLayout.css';
-import AuthorProfile from './author/AuthorProfile';
+
+//компоненты для Author
 import ArticleList from './author/ArticleList';
 import ArticleUpload from './author/ArticleUpload';
-import ArticleStatus from './author/ArticleStatus';
+import ArticleReview from './author/ArticleReview';
 
-// Компоненты для Admin
+//Компоненты для Admin
 import UserManagement from './admin/UserManagement';
 import ArticleManagement from './admin/ArticleManagement';
 
@@ -74,13 +76,11 @@ const DashboardLayout = () => {
       {/*основной контент*/}
       <div className="content">
         <Routes>
-          {/*вложенные маршруты для dashboard */}
           {/*Маршруты для автора*/}
-          {/* <Route path="my-articles" element={<MyArticles />} /> */}
           <Route path="my-articles" element={<ArticleList />} />
           <Route path="upload-article" element={<ArticleUpload />} />
-          <Route path="profile" element={<AuthorProfile />} />
-          <Route path="article/:id/review" element={<ArticleStatus />} />
+          <Route path="profile" element={<ProfilePage />} />
+          <Route path="article/:id/review" element={<ArticleReview />} />
           {/*Маршруты для рецензента*/}
           {/* <Route path="assigned-articles" element={<AssignedArticles />} /> */}
           {/*Маршруты для админа*/}

@@ -1,0 +1,58 @@
+.review-container {
+  padding: 30px;
+  max-width: 900px;
+  margin: 0 auto;
+  font-family: Arial, sans-serif;
+  color: #2c3e50;
+}
+
+.review-card {
+  background: linear-gradient(135deg, #f9f9f9, #ffffff);
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  padding: 25px;
+  margin-top: 20px;
+  border-left: 5px solid #3c92e7; 
+}
+
+.review-info p {
+  margin: 15px 0;
+  font-size: 20px; 
+  font-weight: bold; 
+}
+
+.review-text h3 {
+  font-size: 25px; 
+  color: #3c92e7; 
+  margin-top: 20px;
+  border-bottom: 2px solid #3c92e7;
+  padding-bottom: 5px;
+}
+
+.review-text p {
+  font-size: 18px; 
+  line-height: 1.8;
+  padding: 15px;
+  background-color: #ecf0f1;
+  border-radius: 8px;
+}
+
+.back-button {
+  display: inline-block;
+  padding: 12px 25px;
+  background: linear-gradient(90deg, #52a4db, #3f74e0); 
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  margin-top: 15px;
+  font-size: 16px;
+}
+
+.back-button:hover {
+  background: linear-gradient(90deg, #2f208d, #1c39b7); 
+}
+
+.review-container p {
+  font-size: 18px; 
+  color: #323131; 
+}

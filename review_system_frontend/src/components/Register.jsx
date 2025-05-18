@@ -34,7 +34,7 @@ const Register = () => {
             }
 
             const data = await response.json();
-            setAuthToken(data.token);
+            setAuthToken(data.token, username);
             toast.success('Регистрация успешна!');
             setTimeout(() => {
                 navigate('/dashboard');

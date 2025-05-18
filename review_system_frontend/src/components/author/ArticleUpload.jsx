@@ -1,7 +1,7 @@
 import { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthContext from '../../context/AuthContext';
-import { uploadArticle } from '../../utils/auth';
+import '../../assets/ArticleUpload.css';
 
 const ArticleUpload = () => {
   const { token } = useContext(AuthContext);
@@ -26,9 +26,17 @@ const ArticleUpload = () => {
     formData.append('File', file);
 
     try {
-      await uploadArticle(token, formData);
+      const response = await fetch('http://localhost:5006/api/articles/upload', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+      if (!response.ok) throw new Error('Ошибка при загрузке статьи');
+      await response.json();
       setMessage('Статья успешно загружена');
-      setTimeout(() => navigate('/dashboard/my-articles'), 1500);
+      setTimeout(() => navigate('/dashboard/my-articles'), 1000);
     } catch (error) {
       setMessage('Ошибка при загрузке статьи');
     }
@@ -37,7 +45,7 @@ const ArticleUpload = () => {
   return (
     <div className="upload-container">
       <h2>Загрузка статьи</h2>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="upload-form">
         <div className="form-group">
           <label>Название статьи:</label>
           <input
@@ -45,6 +53,7 @@ const ArticleUpload = () => {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             required
+            className="form-input"
           />
         </div>
         <div className="form-group">
@@ -54,9 +63,10 @@ const ArticleUpload = () => {
             accept=".pdf,.docx"
             onChange={handleFileChange}
             required
+            className="form-input file-input"
           />
         </div>
-        <button type="submit">Отправить на рецензию</button>
+        <button type="submit" className="submit-button">Отправить на рецензию</button>
         {message && <p className="message">{message}</p>}
       </form>
     </div>

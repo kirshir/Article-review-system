@@ -192,7 +192,7 @@ public class ArticlesController : ControllerBase
     }
 
     [HttpGet("{id}/download")]
-    [Authorize(Roles = "Reviewer,Admin")]
+    [Authorize]
     public async Task<IActionResult> DownloadArticle(int id)
     {
         try

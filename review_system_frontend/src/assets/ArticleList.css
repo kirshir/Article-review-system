@@ -1,0 +1,44 @@
+.article-list-container {
+  padding: 20px;
+  max-width: 1500px;
+  margin: 0 auto;
+}
+
+.article-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.article-table th,
+.article-table td {
+  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: left;
+}
+
+.article-table th {
+  background-color: #f4f4f4;
+  font-weight: bold;
+}
+
+.article-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.article-table tr:hover {
+  background-color: #f1f1f1;
+}
+
+.download-button {
+  padding: 8px 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.download-button:hover {
+  background-color: #0056b3;
+}

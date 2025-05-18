@@ -1,43 +1,77 @@
 import { createContext, useState, useEffect } from 'react';
 
-//Создаем контекст для управления состоянием авторизации
 const AuthContext = createContext();
 
-//провайдер контекста
 export const AuthProvider = ({ children }) => {
-  // Состояние для хранения токена
   const [token, setToken] = useState(localStorage.getItem('token') || null);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  // Слушаем изменения в localStorage 
   useEffect(() => {
     const handleStorageChange = () => {
       const newToken = localStorage.getItem('token');
-      setToken(newToken); 
+      setToken(newToken);
+      if (newToken) {
+        fetchUserData(newToken);
+      } else {
+        setUser(null);
+      }
     };
 
-    //добавляем слушатель события storage(срабатывает при изменении localStorage)
     window.addEventListener('storage', handleStorageChange);
-
     handleStorageChange();
 
-    // Удаляем слушатель 
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-    };
+    return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
+  const fetchUserData = async (authToken) => {
+    try {
+      const username = localStorage.getItem('username');
+      if (!username) {
+        console.error('Username не найден в localStorage');
+        setUser(null);
+        return;
+      }
 
-  const setAuthToken = (newToken) => {
+      const response = await fetch(`http://localhost:5006/api/users/${username}`, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setUser({
+          ...data,
+          token: authToken,
+        });
+      } else {
+        console.error('Ошибка API:', await response.text());
+        setUser(null);
+      }
+    } catch (error) {
+      console.error('Ошибка загрузки данных пользователя:', error);
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const setAuthToken = (newToken, username) => {
     if (newToken) {
       localStorage.setItem('token', newToken);
+      if (username) localStorage.setItem('username', username); 
+      fetchUserData(newToken);
     } else {
-      localStorage.removeItem('token'); 
+      localStorage.removeItem('token');
+      localStorage.removeItem('username');
+      setUser(null);
     }
-    setToken(newToken); 
+    setToken(newToken);
   };
 
   return (
-    <AuthContext.Provider value={{ token, setAuthToken }}>
+    <AuthContext.Provider value={{ user, token, setAuthToken, loading }}>
       {children}
     </AuthContext.Provider>
   );

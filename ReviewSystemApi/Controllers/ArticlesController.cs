@@ -110,7 +110,7 @@ public class ArticlesController : ControllerBase
 
         // для рецензентов показываем только назначенные статьи от которых они не отказались
         var assignedArticles = await _context.ReviewAssignments
-            .Where(ra => ra.Reviewer!.Username == User.Identity!.Name && !ra.Declined)
+            .Where(ra => ra.Reviewer!.Username == User.Identity!.Name && !ra.Declined && ra.Article!.Status == ArticleStatus.Pending)
             .Select(ra => new
             {
                 ra.Article!.Id,

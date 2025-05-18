@@ -14,6 +14,11 @@ import ArticleReview from './author/ArticleReview';
 import UserManagement from './admin/UserManagement';
 import ArticleManagement from './admin/ArticleManagement';
 
+//Компоненты для рецензента
+import AssignedArticlesPage from './reviewer/AssignedArticlesPage';
+import CreateReviewPage from './reviewer/CreateReviewPage';
+import MyReviewsPage from './reviewer/MyReviewsPage';
+
 //основной layout для авторизованных пользователей
 const DashboardLayout = () => {
   const navigate = useNavigate();
@@ -41,7 +46,8 @@ const DashboardLayout = () => {
       { path: 'upload-article', label: 'Загрузить статью' },
     ],
     Reviewer: [
-      { path: 'assigned-articles', label: 'Назначенные статьи' },
+      { path: 'assigned-articles', label: 'Статьи для рецензирования' },
+      { path: 'my-reviews', label: 'Мои рецензии' },
     ],
     Admin: [
       { path: 'user-management', label: 'Управление пользователями' },
@@ -83,6 +89,9 @@ const DashboardLayout = () => {
           <Route path="article/:id/review" element={<ArticleReview />} />
           {/*Маршруты для рецензента*/}
           {/* <Route path="assigned-articles" element={<AssignedArticles />} /> */}
+          <Route path="assigned-articles" element={<AssignedArticlesPage />} />
+          <Route path="create-review/:articleId" element={<CreateReviewPage />} />
+          <Route path="my-reviews" element={<MyReviewsPage />} />
           {/*Маршруты для админа*/}
           <Route path="user-management" element={<UserManagement />} />
           <Route path="article-management" element={<ArticleManagement />} />

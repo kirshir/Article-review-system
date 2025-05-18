@@ -101,7 +101,8 @@ public class ArticlesController : ControllerBase
                     a.Id,
                     a.Title,
                     a.SubmissionDate,
-                    AuthorName = a.Author!.Username
+                    AuthorName = a.Author!.Username,
+                    a.Status
                 })
                 .ToListAsync();
             return Ok(articles);
@@ -115,7 +116,8 @@ public class ArticlesController : ControllerBase
                 ra.Article!.Id,
                 ra.Article.Title,
                 ra.Article.SubmissionDate,
-                AuthorName = ra.Article.Author!.Username
+                AuthorName = ra.Article.Author!.Username,
+                ra.Article.Status
             })
             .ToListAsync();
 
@@ -188,7 +190,7 @@ public class ArticlesController : ControllerBase
             return BadRequest(ex.Message);
         }
     }
-    
+
     [HttpGet("{id}/download")]
     [Authorize(Roles = "Reviewer,Admin")]
     public async Task<IActionResult> DownloadArticle(int id)
@@ -201,13 +203,27 @@ public class ArticlesController : ControllerBase
                 return NotFound("Article not found or file does not exist");
             }
 
+            // var fileStream = new FileStream(article.FilePath, FileMode.Open, FileAccess.Read);
+            // var fileName = Path.GetFileName(article.FilePath);
             var fileStream = new FileStream(article.FilePath, FileMode.Open, FileAccess.Read);
             var fileName = Path.GetFileName(article.FilePath);
-            return File(fileStream, "application/octet-stream", fileName);
+            var contentType = GetContentType(fileName); // Определяем тип контента
+            return File(fileStream, contentType, fileName);
         }
         catch (Exception ex)
         {
             return BadRequest(ex.Message);
         }
+    }
+    
+    private string GetContentType(string fileName)
+    {
+        var extension = Path.GetExtension(fileName).ToLower();
+        return extension switch
+        {
+            ".pdf" => "application/pdf",
+            ".docx" => "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            _ => "application/octet-stream"
+        };
     }
 }

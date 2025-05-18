@@ -4,10 +4,9 @@ import { getUserRole } from '../utils/auth';
 import AuthContext from '../context/AuthContext';
 import '../assets/DashboardLayout.css';
 
-// Заглушки для страниц (доделать позже)
-const MyArticles = () => <div>Мои статьи (для Author)</div>;
-const AssignedArticles = () => <div>Назначенные статьи (для Reviewer)</div>;
-const AdminPanel = () => <div>Панель администратора (для Admin)</div>;
+// Компоненты для Admin
+import UserManagement from './admin/UserManagement';
+import ArticleManagement from './admin/ArticleManagement';
 
 //основной layout для авторизованных пользователей
 const DashboardLayout = () => {
@@ -37,7 +36,8 @@ const DashboardLayout = () => {
       { path: 'assigned-articles', label: 'Назначенные статьи' },
     ],
     Admin: [
-      { path: 'admin-panel', label: 'Панель администратора' },
+      { path: 'user-management', label: 'Управление пользователями' },
+      { path: 'article-management', label: 'Управление статьями' }, 
     ],
   };
 
@@ -70,11 +70,12 @@ const DashboardLayout = () => {
         <Routes>
           {/*вложенные маршруты для dashboard */}
           {/*Маршруты для автора*/}
-          <Route path="my-articles" element={<MyArticles />} />
+          {/* <Route path="my-articles" element={<MyArticles />} /> */}
           {/*Маршруты для рецензента*/}
-          <Route path="assigned-articles" element={<AssignedArticles />} />
+          {/* <Route path="assigned-articles" element={<AssignedArticles />} /> */}
           {/*Маршруты для админа*/}
-          <Route path="admin-panel" element={<AdminPanel />} />
+          <Route path="user-management" element={<UserManagement />} />
+          <Route path="article-management" element={<ArticleManagement />} />
           {/*пустой марширут*/}
           <Route path="*" element={<div>Выберите раздел в меню</div>} />
         </Routes>

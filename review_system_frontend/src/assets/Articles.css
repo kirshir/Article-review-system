@@ -1,0 +1,48 @@
+.articles-container {
+    padding: 20px;
+}
+
+.articles-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.articles-table th,
+.articles-table td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: left;
+}
+
+.articles-table th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+}
+
+.articles-button {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin: 5px;
+    transition: background-color 0.3s;
+}
+
+.download-button {
+    background-color: #007bff;
+    color: white;
+}
+
+.download-button:hover {
+    background-color: #0056b3;
+}
+
+.delete-button {
+    background-color: #dc3545;
+    color: white;
+}
+
+.delete-button:hover {
+    background-color: #c82333;
+}

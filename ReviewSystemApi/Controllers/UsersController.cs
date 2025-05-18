@@ -36,6 +36,9 @@ public class UsersController : ControllerBase
                 PasswordHash = passwordHash,
                 Email = dto.Email,
                 Role = dto.Role,
+                FullName = dto.FullName ?? string.Empty,
+                Specialization = dto.Specialization ?? string.Empty,
+                Location = dto.Location ?? string.Empty,
                 CreatedAt = DateTime.UtcNow
             };
 

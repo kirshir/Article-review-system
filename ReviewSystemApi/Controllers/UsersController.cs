@@ -154,4 +154,36 @@ public class UsersController : ControllerBase
             return BadRequest(ex.Message);
         }
     }
+    [HttpGet("{username}")]
+    [Authorize]
+    public async Task<IActionResult> GetUserByUsername(string username)
+    {
+        try
+        {
+            var user = await _context.Users
+                .Where(u => u.Username == username)
+                .Select(u => new
+                {
+                    id = u.Id,
+                    username = u.Username,
+                    fullName = u.FullName,
+                    email = u.Email,
+                    location = u.Location,
+                    specialization = u.Specialization,
+                    role = u.Role.ToString()
+                })
+                .FirstOrDefaultAsync();
+
+            if (user == null)
+            {
+                return NotFound(new { message = "Пользователь не найден" });
+            }
+
+            return Ok(user);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
 }

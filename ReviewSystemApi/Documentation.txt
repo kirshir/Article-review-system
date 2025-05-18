@@ -30,6 +30,21 @@ POST http://localhost:5006/api/auth/register
   "role": "string" // Роль пользователя (например, "Author")
 }
 
+GET http://localhost:5006/api/users/{username}
+Описание: Возвращает данные пользователя.
+Доступ: Доступно всем авторизованным пользователям с валидным JWT-токеном. 
+Тело запроса: Нет.
+
+Ответ (успех):
+{  
+  "username": "string",  
+  "email": "string",  
+  "fullName": "string",
+  "specialization": "string",
+  "location": "string",
+  "role": "string" 
+}
+
 
 
 POST http://localhost:5006/api/auth/login  

@@ -3,6 +3,10 @@ import { useEffect, useState, useContext } from 'react';
 import { getUserRole } from '../utils/auth';
 import AuthContext from '../context/AuthContext';
 import '../assets/DashboardLayout.css';
+import AuthorProfile from './author/AuthorProfile';
+import ArticleList from './author/ArticleList';
+import ArticleUpload from './author/ArticleUpload';
+import ArticleStatus from './author/ArticleStatus';
 
 // Компоненты для Admin
 import UserManagement from './admin/UserManagement';
@@ -30,7 +34,9 @@ const DashboardLayout = () => {
   //ссылки для навигации в зависимости от роли
   const navLinks = {
     Author: [
+      { path: 'profile', label: 'Мой профиль' },
       { path: 'my-articles', label: 'Мои статьи' },
+      { path: 'upload-article', label: 'Загрузить статью' },
     ],
     Reviewer: [
       { path: 'assigned-articles', label: 'Назначенные статьи' },
@@ -71,6 +77,10 @@ const DashboardLayout = () => {
           {/*вложенные маршруты для dashboard */}
           {/*Маршруты для автора*/}
           {/* <Route path="my-articles" element={<MyArticles />} /> */}
+          <Route path="my-articles" element={<ArticleList />} />
+          <Route path="upload-article" element={<ArticleUpload />} />
+          <Route path="profile" element={<AuthorProfile />} />
+          <Route path="article/:id/review" element={<ArticleStatus />} />
           {/*Маршруты для рецензента*/}
           {/* <Route path="assigned-articles" element={<AssignedArticles />} /> */}
           {/*Маршруты для админа*/}

@@ -11,29 +11,29 @@ const MyReviewsPage = () => {
     const { token } = useContext(AuthContext);
     const navigate = useNavigate();
 
-    const fetchMyReviews = async () => {
-        try {
-            const response = await fetch('http://localhost:5006/api/reviews/my-reviews', {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-            
-            if (!response.ok) {
-                throw new Error('Ошибка при загрузке рецензий');
-            }
-            
-            const data = await response.json();
-            setReviews(data);
-        } catch (err) {
-            setError(err.message);
-        } finally {
-            setIsLoading(false);
-        }
-    };
 
     useEffect(() => {
         if (token) {
+            const fetchMyReviews = async () => {
+                try {
+                    const response = await fetch('http://localhost:5006/api/reviews/my-reviews', {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('Ошибка при загрузке рецензий');
+                    }
+                    
+                    const data = await response.json();
+                    setReviews(data);
+                } catch (err) {
+                    setError(err.message);
+                } finally {
+                    setIsLoading(false);
+                }
+            };
             fetchMyReviews();
         } else {
             navigate('/login');

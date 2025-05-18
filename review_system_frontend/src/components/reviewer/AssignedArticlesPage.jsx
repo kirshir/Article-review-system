@@ -11,43 +11,77 @@ const AssignedArticlesPage = () => {
     const { token } = useContext(AuthContext);
     const navigate = useNavigate();
 
-    const fetchAssignedArticles = async () => {
-        try {
-            const response = await fetch('http://localhost:5006/api/articles', {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
+    // const fetchAssignedArticles = async () => {
+    //     try {
+    //         const response = await fetch('http://localhost:5006/api/articles', {
+    //             headers: {
+    //                 'Authorization': `Bearer ${token}`
+    //             }
+    //         });
             
-            if (!response.ok) {
-                throw new Error('Ошибка при загрузке статей');
-            }
+    //         if (!response.ok) {
+    //             throw new Error('Ошибка при загрузке статей');
+    //         }
             
-            const data = await response.json();
-            // Загружаем список отклоненных статей из localStorage
-            const declinedArticles = JSON.parse(localStorage.getItem('declinedArticles') || '[]');
+    //         const data = await response.json();
+    //         // Загружаем список отклоненных статей из localStorage
+    //         const declinedArticles = JSON.parse(localStorage.getItem('declinedArticles') || '[]');
             
-            // Фильтруем статьи: оставляем только те, которые не отклонены и не в процессе рецензирования
-            const filteredArticles = data.filter(article => 
-                !declinedArticles.includes(article.id)
-            );
+    //         // Фильтруем статьи: оставляем только те, которые не отклонены и не в процессе рецензирования
+    //         const filteredArticles = data.filter(article => 
+    //             !declinedArticles.includes(article.id)
+    //         );
 
-            // // Помечаем отклоненные статьи
-            // const articlesWithStatus = data.map(article => ({
-            //     ...article,
-            //     declined: declinedArticles.includes(article.id)
-            // }));
+    //         // // Помечаем отклоненные статьи
+    //         // const articlesWithStatus = data.map(article => ({
+    //         //     ...article,
+    //         //     declined: declinedArticles.includes(article.id)
+    //         // }));
 
-            setArticles(filteredArticles);
-        } catch (err) {
-            setError(err.message);
-        } finally {
-            setIsLoading(false);
-        }
-    };
+    //         setArticles(filteredArticles);
+    //     } catch (err) {
+    //         setError(err.message);
+    //     } finally {
+    //         setIsLoading(false);
+    //     }
+    // };
 
     useEffect(() => {
         if (token) {
+            const fetchAssignedArticles = async () => {
+                try {
+                    const response = await fetch('http://localhost:5006/api/articles', {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('Ошибка при загрузке статей');
+                    }
+                    
+                    const data = await response.json();
+                    // Загружаем список отклоненных статей из localStorage
+                    const declinedArticles = JSON.parse(localStorage.getItem('declinedArticles') || '[]');
+                    
+                    // Фильтруем статьи: оставляем только те, которые не отклонены и не в процессе рецензирования
+                    const filteredArticles = data.filter(article => 
+                        !declinedArticles.includes(article.id)
+                    );
+
+                    // // Помечаем отклоненные статьи
+                    // const articlesWithStatus = data.map(article => ({
+                    //     ...article,
+                    //     declined: declinedArticles.includes(article.id)
+                    // }));
+
+                    setArticles(filteredArticles);
+                } catch (err) {
+                    setError(err.message);
+                } finally {
+                    setIsLoading(false);
+                }
+            };
             fetchAssignedArticles();
         } else {
             navigate('/login');

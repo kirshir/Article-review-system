@@ -46,10 +46,12 @@ const DashboardLayout = () => {
       { path: 'upload-article', label: 'Загрузить статью' },
     ],
     Reviewer: [
+      { path: 'profile', label: 'Мой профиль' },
       { path: 'assigned-articles', label: 'Статьи для рецензирования' },
       { path: 'my-reviews', label: 'Мои рецензии' },
     ],
     Admin: [
+      { path: 'profile', label: 'Мой профиль' },
       { path: 'user-management', label: 'Управление пользователями' },
       { path: 'article-management', label: 'Управление статьями' }, 
     ],
@@ -82,13 +84,12 @@ const DashboardLayout = () => {
       {/*основной контент*/}
       <div className="content">
         <Routes>
+          <Route path="profile" element={<ProfilePage />} />
           {/*Маршруты для автора*/}
           <Route path="my-articles" element={<ArticleList />} />
           <Route path="upload-article" element={<ArticleUpload />} />
-          <Route path="profile" element={<ProfilePage />} />
           <Route path="article/:id/review" element={<ArticleReview />} />
           {/*Маршруты для рецензента*/}
-          {/* <Route path="assigned-articles" element={<AssignedArticles />} /> */}
           <Route path="assigned-articles" element={<AssignedArticlesPage />} />
           <Route path="create-review/:articleId" element={<CreateReviewPage />} />
           <Route path="my-reviews" element={<MyReviewsPage />} />

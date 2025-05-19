@@ -95,7 +95,6 @@ public class ArticlesController : ControllerBase
         if (User.IsInRole("Admin"))
         {
             var articles = await _context.Articles
-                .Where(a => a.Status == ArticleStatus.Pending)
                 .Select(a => new
                 {
                     a.Id,
